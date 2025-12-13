@@ -8,59 +8,87 @@ interface Params {
 }
 
 export async function GET(_req: NextRequest, { params }: Params) {
-  const user = await getCurrentUser();
-  if (!user)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const user = await getCurrentUser();
+    if (!user)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  await connectDB();
+    await connectDB();
 
-  const { projectId } = await params;
-  const project = await Project.findById(projectId).lean();
-  if (!project) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
+    const { projectId } = await params;
+    
+    // Validate projectId format
+    if (!projectId || typeof projectId !== "string") {
+      return NextResponse.json({ error: "Invalid project ID" }, { status: 400 });
+    }
 
-  const isMember =
-    project.owner.toString() === user._id.toString() ||
-    project.members.some((m: any) => m.toString() === user._id.toString());
+    const project = await Project.findById(projectId).lean();
+    if (!project) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
 
-  if (!isMember) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+    const isMember =
+      project.owner.toString() === user._id.toString() ||
+      project.members.some((m: any) => m.toString() === user._id.toString());
 
-  return NextResponse.json(
-    {
-      project: {
-        id: project._id,
-        name: project.name,
-        description: project.description,
+    if (!isMember) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    return NextResponse.json(
+      {
+        project: {
+          id: project._id,
+          name: project.name,
+          description: project.description,
+        },
       },
-    },
-    { status: 200 }
-  );
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error fetching project:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
-  const user = await getCurrentUser();
-  if (!user)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const user = await getCurrentUser();
+    if (!user)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  await connectDB();
+    await connectDB();
 
-  const { projectId } = await params;
-  const project = await Project.findById(projectId);
-  if (!project) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
+    const { projectId } = await params;
+    
+    // Validate projectId format
+    if (!projectId || typeof projectId !== "string") {
+      return NextResponse.json({ error: "Invalid project ID" }, { status: 400 });
+    }
 
-  if (project.owner.toString() !== user._id.toString()) {
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    if (project.owner.toString() !== user._id.toString()) {
+      return NextResponse.json(
+        { error: "Only owner can delete project" },
+        { status: 403 }
+      );
+    }
+
+    await project.deleteOne();
+
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (error) {
+    console.error("Error deleting project:", error);
     return NextResponse.json(
-      { error: "Only owner can delete project" },
-      { status: 403 }
+      { error: "Internal server error" },
+      { status: 500 }
     );
   }
-
-  await project.deleteOne();
-
-  return NextResponse.json({ success: true }, { status: 200 });
 }

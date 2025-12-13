@@ -16,12 +16,12 @@ interface IssuesResponse {
 }
 
 interface Params {
-  params: any;
+  params: Promise<{ projectId: string }>;
 }
 
 export default async function ProjectDetailPage({ params }: Params) {
   const base = process.env.NEXT_PUBLIC_BASE_URL || "";
-  const data = await params;
+  const { projectId } = await params;
   const cookieStore = await cookies();
   
   // Format cookies as a Cookie header string
@@ -31,13 +31,13 @@ export default async function ProjectDetailPage({ params }: Params) {
     .join("; ");
   
   const [projectRes, issuesRes] = await Promise.all([
-    fetch(`${base}/api/projects/${data.projectId}`, {
+    fetch(`${base}/api/projects/${projectId}`, {
       cache: "no-store",
       headers: {
         Cookie: cookieHeader,
       },
     }),
-    fetch(`${base}/api/issues?projectId=${data.projectId}`, {
+    fetch(`${base}/api/issues?projectId=${projectId}`, {
       cache: "no-store",
       headers: {
         Cookie: cookieHeader,
@@ -94,7 +94,7 @@ export default async function ProjectDetailPage({ params }: Params) {
             status={i.status}
             priority={i.priority}
             createdAt={i.createdAt}
-            projectId={data.projectId}
+            projectId={projectId}
           />
         ))}
       </div>
