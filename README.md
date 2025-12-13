@@ -280,33 +280,6 @@ npm run lint
 4. Cookie is automatically sent with subsequent requests
 5. Logout clears the cookie
 
-## 🚢 Deployment
-
-### Vercel (Recommended)
-
-SprintFlow is optimized for deployment on Vercel:
-
-1. **Push your code to GitHub**
-2. **Import project in Vercel**
-   - Go to [vercel.com](https://vercel.com)
-   - Click "New Project"
-   - Import your GitHub repository
-3. **Configure environment variables**
-   - Add `MONGODB_URI` and `JWT_SECRET` in Vercel dashboard
-4. **Deploy**
-   - Vercel will automatically detect Next.js and deploy
-
-### Other Platforms
-
-The app can be deployed to any platform that supports Next.js:
-- **Netlify**
-- **Railway**
-- **Render**
-- **AWS Amplify**
-- **DigitalOcean App Platform**
-
-Ensure you set the environment variables in your deployment platform.
-
 ## 🔄 CI/CD
 
 The project includes GitHub Actions workflows for continuous integration:
@@ -317,19 +290,6 @@ The project includes GitHub Actions workflows for continuous integration:
 - **Linting**: Runs ESLint checks
 
 See `.github/workflows/ci.yml` for the complete CI configuration.
-
-## 📝 License
-
-This project is private and proprietary.
-
-## 🤝 Contributing
-
-This is a private project. For questions or suggestions, please contact the development team.
-
-## 📞 Support
-
-For issues or questions, please create an issue in the repository or contact the development team.
-
 ---
 
 **Built with ❤️ using Next.js and MongoDB**
