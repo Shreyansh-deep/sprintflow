@@ -6,7 +6,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { issueUpdateSchema } from "@/lib/validation";
 
 interface Params {
-  params: { issueId: string };
+  params: Promise<{ issueId: string }>;
 }
 
 async function assertIssueAccess(issueId: string, userId: string) {

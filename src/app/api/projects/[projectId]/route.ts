@@ -4,7 +4,7 @@ import Project from "@/models/Project";
 import { getCurrentUser } from "@/lib/auth";
 
 interface Params {
-  params: { projectId: string };
+  params: Promise<{ projectId: string }>;
 }
 
 export async function GET(_req: NextRequest, { params }: Params) {
