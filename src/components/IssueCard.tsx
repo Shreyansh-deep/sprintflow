@@ -6,6 +6,7 @@ interface IssueCardProps {
   status: string;
   priority: string;
   createdAt?: string | Date;
+  projectId: string;
 }
 
 const statusColors: Record<string, string> = {
@@ -27,10 +28,11 @@ export default function IssueCard({
   status,
   priority,
   createdAt,
+  projectId,
 }: IssueCardProps) {
   return (
     <Link
-      href={`./issues/${id}`}
+      href={`/dashboard/projects/${projectId}/issues/${id}`}
       className="block rounded-lg border border-slate-800 bg-slate-900 p-3 text-xs hover:border-sky-500"
     >
       <div className="flex items-center justify-between gap-2">

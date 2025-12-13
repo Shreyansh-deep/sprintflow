@@ -1,33 +1,45 @@
+// src/app/dashboard/projects/page.tsx
+import Project from "@/models/Project";
+import { connectDB } from "@/lib/mongodb";
 import ProjectCard from "@/components/ProjectCard";
+import { getCurrentUser } from "@/lib/auth";
 
-interface ProjectsResponse {
-  projects: {
-    id: string;
-    name: string;
-    description?: string;
-    createdAt?: string;
-  }[];
+interface ProjectsResponseItem {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt?: string;
 }
 
 export default async function ProjectsPage() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/projects`,
-    {
-      // Use no-store to always fetch fresh, or remove for caching
-      cache: "no-store",
-    }
-  );
-
-  if (!res.ok) {
+  // Ensure user is available server-side (optional—layout already protected)
+  const user = await getCurrentUser();
+  if (!user) {
     return (
       <div>
         <h1 className="text-2xl font-semibold text-slate-50">Projects</h1>
-        <p className="mt-2 text-sm text-red-400">Failed to load projects.</p>
+        <p className="mt-2 text-sm text-red-400">
+          Unauthorized — please login.
+        </p>
       </div>
     );
   }
 
-  const data = (await res.json()) as ProjectsResponse;
+  await connectDB();
+
+  // Query projects directly
+  const projectsRaw = await Project.find({
+    $or: [{ owner: user._id }, { members: user._id }],
+  })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const projects = (projectsRaw || []).map((p) => ({
+    id: String(p._id),
+    name: p.name,
+    description: p.description,
+    createdAt: p.createdAt?.toString(),
+  })) as ProjectsResponseItem[];
 
   return (
     <div>
@@ -40,13 +52,14 @@ export default async function ProjectsPage() {
           New Project
         </a>
       </div>
+
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        {data.projects.length === 0 && (
+        {projects.length === 0 && (
           <p className="text-sm text-slate-400">
             No projects yet. Create your first one.
           </p>
         )}
-        {data.projects.map((p) => (
+        {projects.map((p) => (
           <ProjectCard
             key={p.id}
             id={p.id}

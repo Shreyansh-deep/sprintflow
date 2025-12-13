@@ -30,8 +30,9 @@ export async function GET(_req: NextRequest, { params }: Params) {
   if (!user)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const { issueId } = await params;
   const { issue, project, isMember } = await assertIssueAccess(
-    params.issueId,
+    issueId,
     user._id.toString()
   );
 
@@ -62,8 +63,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   if (!user)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const { issueId } = await params;
   const { issue, project, isMember } = await assertIssueAccess(
-    params.issueId,
+    issueId,
     user._id.toString()
   );
 
@@ -90,7 +92,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     delete updateData.assigneeId;
   }
 
-  const updated = await Issue.findByIdAndUpdate(params.issueId, updateData, {
+  const updated = await Issue.findByIdAndUpdate(issueId, updateData, {
     new: true,
   }).lean();
 
@@ -99,8 +101,11 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       issue: {
         id: updated?._id,
         title: updated?.title,
+        description: updated?.description,
         status: updated?.status,
         priority: updated?.priority,
+        createdAt: updated?.createdAt,
+        updatedAt: updated?.updatedAt,
       },
     },
     { status: 200 }
@@ -112,8 +117,9 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
   if (!user)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const { issueId } = await params;
   const { issue, project, isMember } = await assertIssueAccess(
-    params.issueId,
+    issueId,
     user._id.toString()
   );
 
@@ -128,7 +134,7 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     );
   }
 
-  await Issue.findByIdAndDelete(params.issueId);
+  await Issue.findByIdAndDelete(issueId);
 
   return NextResponse.json({ success: true }, { status: 200 });
 }

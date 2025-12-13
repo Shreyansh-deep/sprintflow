@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
+import LogoutButton from "@/components/LogoutButton";
 
 export default async function DashboardLayout({
   children,
@@ -33,23 +34,9 @@ export default async function DashboardLayout({
             Projects
           </a>
         </div>
-        <form
-          action="/api/auth/logout"
-          method="post"
-          className="mt-6"
-          onSubmit={async (e) => {
-            // no-op on client; logout will be via fetch/button on pages
-          }}
-        >
-          <button
-            type="submit"
-            className="w-full rounded-md border border-red-500 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/10"
-            formAction={undefined}
-          >
-            {/* This button's actual action will be implemented via client in dashboard page */}
-            Logout
-          </button>
-        </form>
+        <div className="mt-6">
+          <LogoutButton />
+        </div>
       </aside>
       <section>{children}</section>
     </div>

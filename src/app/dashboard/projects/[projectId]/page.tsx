@@ -1,4 +1,5 @@
 import IssueCard from "@/components/IssueCard";
+import { cookies } from "next/headers";
 
 interface ProjectResponse {
   project: { id: string; name: string; description?: string };
@@ -15,15 +16,32 @@ interface IssuesResponse {
 }
 
 interface Params {
-  params: { projectId: string };
+  params: any;
 }
 
 export default async function ProjectDetailPage({ params }: Params) {
   const base = process.env.NEXT_PUBLIC_BASE_URL || "";
+  const data = await params;
+  const cookieStore = await cookies();
+  
+  // Format cookies as a Cookie header string
+  const cookieHeader = cookieStore
+    .getAll()
+    .map((cookie) => `${cookie.name}=${cookie.value}`)
+    .join("; ");
+  
   const [projectRes, issuesRes] = await Promise.all([
-    fetch(`${base}/api/projects/${params.projectId}`, { cache: "no-store" }),
-    fetch(`${base}/api/issues?projectId=${params.projectId}`, {
+    fetch(`${base}/api/projects/${data.projectId}`, {
       cache: "no-store",
+      headers: {
+        Cookie: cookieHeader,
+      },
+    }),
+    fetch(`${base}/api/issues?projectId=${data.projectId}`, {
+      cache: "no-store",
+      headers: {
+        Cookie: cookieHeader,
+      },
     }),
   ]);
 
@@ -76,6 +94,7 @@ export default async function ProjectDetailPage({ params }: Params) {
             status={i.status}
             priority={i.priority}
             createdAt={i.createdAt}
+            projectId={data.projectId}
           />
         ))}
       </div>

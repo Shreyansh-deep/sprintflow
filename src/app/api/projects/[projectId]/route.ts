@@ -14,7 +14,8 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
   await connectDB();
 
-  const project = await Project.findById(params.projectId).lean();
+  const { projectId } = await params;
+  const project = await Project.findById(projectId).lean();
   if (!project) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -46,7 +47,8 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
 
   await connectDB();
 
-  const project = await Project.findById(params.projectId);
+  const { projectId } = await params;
+  const project = await Project.findById(projectId);
   if (!project) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
