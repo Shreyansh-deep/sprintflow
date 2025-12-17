@@ -36,7 +36,7 @@ export default function NewProjectPage() {
       return;
     }
 
-    router.push("/dashboard/projects");
+    router.push("/dashboard");
   }
 
   return (

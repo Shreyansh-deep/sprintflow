@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import UserProfileDropdown from "./UserProfileDropdown";
 
 export default function Header() {
   const pathname = usePathname();
@@ -15,9 +16,12 @@ export default function Header() {
         </Link>
         <nav className="flex items-center gap-4 text-sm text-slate-300">
           {isDashboard ? (
-            <Link href="/dashboard/projects" className="hover:text-sky-400">
-              Projects
-            </Link>
+            <>
+              <Link href="/dashboard" className="hover:text-sky-400">
+                Dashboard
+              </Link>
+              <UserProfileDropdown />
+            </>
           ) : (
             <>
               <Link href="/login" className="hover:text-sky-400">

@@ -175,6 +175,12 @@ export default function IssueDetailPage() {
 
   return (
     <div className="max-w-2xl">
+      <a
+        href={`/dashboard/projects/${params.projectId}`}
+        className="mb-4 inline-flex items-center text-sm text-slate-400 hover:text-sky-400"
+      >
+        ← Back to Project
+      </a>
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <p className="text-xs text-slate-500">Issue</p>
